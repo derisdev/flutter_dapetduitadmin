@@ -1,5 +1,6 @@
 import 'package:dapetduit_admin/service/fetchdata.dart';
 import 'package:dapetduit_admin/ui/detailuser.dart';
+import 'package:dapetduit_admin/ui/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -49,6 +50,16 @@ class _ListUserState extends State<ListUser> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Daftar User'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: (){
+              Navigator.push(context, MaterialPageRoute(
+                builder: (context) => Search(data: data['user'])
+              ));
+            },
+          )
+        ],
       ),
       body: isLoading? 
       SpinKitThreeBounce(

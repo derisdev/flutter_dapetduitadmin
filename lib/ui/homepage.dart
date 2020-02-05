@@ -69,14 +69,14 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           title: Text('Admin'),
           actions: <Widget>[
+            Icon(Icons.person),
             Padding(
               padding: const EdgeInsets.only(right: 20),
               child: IconButton(
-                icon: Icon(Icons.person),
-                onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => Aquisition()
-                  ));
+                icon: Icon(Icons.chevron_right),
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Aquisition()));
                 },
               ),
             )
@@ -160,21 +160,25 @@ class _HomePageState extends State<HomePage> {
                             child: ListView.builder(
                               itemCount: snapshot.data.length,
                               itemBuilder: (context, index) {
+                                String icon;
+                                if (snapshot.data[index]['via'] == 'DANA') {
+                                  icon = 'dana';
+                                } else if (snapshot.data[index]['via'] == 'OVO') {
+                                  icon = 'ovo';
+                                } else {
+                                  icon = 'gopay';
+                                }
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8.0),
                                   child: Card(
                                     elevation: 3,
                                     child: ListTile(
-                                      leading: Container(
-                                        decoration: BoxDecoration(
-                                        color: Colors.amber,
-                                          borderRadius: BorderRadius.circular(40)
-                                        ),
-                                        width: 50,
-                                        height: 50,
-                                        child: Center(child: Text('6', style: TextStyle(color: Colors.white),)),
-                                      ),
+                                      leading: ClipRRect(
+                                          borderRadius:
+                                              new BorderRadius.circular(8.0),
+                                          child: Image.asset(
+                                              'images/icon/$icon.jpeg')),
                                       title: InkWell(
                                         onLongPress: () {
                                           Clipboard.setData(ClipboardData(
@@ -188,7 +192,9 @@ class _HomePageState extends State<HomePage> {
                                           );
                                         },
                                         child: Text(
-                                            '${snapshot.data[index].phone}', style: TextStyle(),),
+                                          '${snapshot.data[index].phone}',
+                                          style: TextStyle(),
+                                        ),
                                       ),
                                       subtitle: Text(
                                         '${snapshot.data[index].amount}, ${snapshot.data[index].via}',
@@ -198,35 +204,51 @@ class _HomePageState extends State<HomePage> {
                                         children: <Widget>[
                                           Text(
                                             snapshot.data[index].status,
-                                            style:
-                                                TextStyle(color: snapshot.data[index].status == 'Berhasil'? Colors.amber: Colors.red),
+                                            style: TextStyle(
+                                                color: snapshot.data[index]
+                                                            .status ==
+                                                        'Berhasil'
+                                                    ? Colors.amber
+                                                    : Colors.red),
                                           ),
-                                          snapshot.data[index].status == 'Berhasil'? 
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                                            child: Icon(Icons.check, color: Colors.green,),
-                                          )
-                                          : Container(
-                                            child: IconButton(
-                                              icon: Icon(Icons.update,
-                                                  color: Colors.green),
-                                              onPressed: () {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (context) =>
-                                                        _onCHangeStatus(
-                                                            context,
-                                                            snapshot.data[index]
-                                                                .id));
-                                              },
-                                            ),
-                                          )
+                                          snapshot.data[index].status ==
+                                                  'Berhasil'
+                                              ? Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 15),
+                                                  child: Icon(
+                                                    Icons.check,
+                                                    color: Colors.green,
+                                                  ),
+                                                )
+                                              : Container(
+                                                  child: IconButton(
+                                                    icon: Icon(Icons.update,
+                                                        color: Colors.green),
+                                                    onPressed: () {
+                                                      showDialog(
+                                                          context: context,
+                                                          builder: (context) =>
+                                                              _onCHangeStatus(
+                                                                  context,
+                                                                  snapshot
+                                                                      .data[
+                                                                          index]
+                                                                      .id));
+                                                    },
+                                                  ),
+                                                )
                                         ],
                                       ),
                                       onTap: () {
-                                        Navigator.push(context, MaterialPageRoute(
-                                          builder: (context) => PaymentDetail(data: snapshot.data[index])
-                                        ));
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PaymentDetail(
+                                                        data: snapshot
+                                                            .data[index])));
                                       },
                                     ),
                                   ),
