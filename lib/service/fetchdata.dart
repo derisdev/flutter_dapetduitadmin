@@ -13,64 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class FetchData {
 
   
-  Future updateRewards(String rewards) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString('token');
-    String rewardsId = prefs.getString('rewards_id');
-    String refferalCodeRefferer = prefs.getString('refferal_code_refferer');
-
-    if(refferalCodeRefferer == '') {
-      refferalCodeRefferer = 'norefferer';
-    }
-
-    String baseUrl =
-        "https://duitrest.000webhostapp.com/api/v1/rewards/$rewardsId?token=$token";
-    var response = await http.post(baseUrl,
-        headers: {"Accept": "application/json"},
-        body: {'rewards': rewards, 'refferal': refferalCodeRefferer,'_method': 'PATCH'});
-    if (response.statusCode == 200) {
-      print('rewards updated');
-    }
-    print(response.statusCode);
-    print(response.body);
-  }
-
-  
-
-  Future readRewards() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String rewardsId = prefs.getString('rewards_id');
-    int currentCoin = prefs.getInt('coin');
-    int fromRefferal = prefs.getInt('fromrefferal');
-
-    String baseUrl =
-        "https://duitrest.000webhostapp.com/api/v1/rewards/$rewardsId";
-    var response = await http.get(baseUrl,
-        headers: {"Accept": "application/json"});
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      String newRewardsFromRefferal = jsonData['rewards']['fromrefferal'];
-      int newRewardFromRefferal = int.parse(newRewardsFromRefferal);
-      if(newRewardFromRefferal > fromRefferal) {
-      prefs.setInt('coin', currentCoin+=newRewardFromRefferal);
-      prefs.setInt('fromrefferal', newRewardFromRefferal);
-
-
-  print('object created');
-      }
-    }
-    print(response.statusCode);
-    print(response.body);
-  }
-
-  
-
-
-  
- 
   Future updatePayment(int id) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString('token');
 
     String baseUrl =
         "https://duitrest.000webhostapp.com/api/v1/payment/$id";
@@ -87,8 +30,6 @@ class FetchData {
         gravity: ToastGravity.BOTTOM,
       );
     }
-    print(response.statusCode);
-    print(response.body);
   }
   Future readPayment() async {
 
@@ -99,12 +40,9 @@ class FetchData {
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       return (jsonData['payment'] as List).map((payment) {
-      print('Inserting $payment');
       DBHelperPayment.db.createPayment(Payment.fromJson(payment));
     }).toList();
     }
-    print(response.statusCode);
-    print(response.body);
   }
 
 
@@ -117,12 +55,9 @@ class FetchData {
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       return (jsonData['notif'] as List).map((notif) {
-      print('Inserting $notif');
       DBHelperNotif.db.createNotif(Notif.fromJson(notif));
     }).toList();
     }
-    print(response.statusCode);
-    print(response.body);
   }
 
   Future readFeedback() async {
@@ -134,12 +69,9 @@ class FetchData {
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       return (jsonData['feedback'] as List).map((feedback) {
-      print('Inserting $feedback');
       DBHelperFeedback.db.createFeedback(FeedbackModel.fromJson(feedback));
     }).toList();
     }
-    print(response.statusCode);
-    print(response.body);
   }
 
 Future createFeedback(String question, String answer) async {
@@ -153,8 +85,6 @@ Future createFeedback(String question, String answer) async {
         headers: {"Accept": "application/json"},
         body: {"question" : question, "answer" : answer}
         );
-    print(response.statusCode);
-    print(response.body);
     if (response.statusCode == 201) {
       return true;
     }
@@ -178,8 +108,6 @@ Future createNotif(String title, String des) async {
         headers: {"Accept": "application/json"},
         body: {"title" : title, "description" : des, "time" : formattedDate}
         );
-    print(response.statusCode);
-    print(response.body);
     if (response.statusCode == 201) {
       return true;
     }
@@ -188,6 +116,125 @@ Future createNotif(String title, String des) async {
      }
   
 }
+
+Future readUser() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String token = prefs.getString('token');
+   String baseUrl =
+        "https://duitrest.000webhostapp.com/api/v1/user/index?token=$token";
+    var response = await http.get(baseUrl,
+        headers: {"Accept": "application/json"}
+        );
+    if (response.statusCode == 200) {
+
+      var data = json.decode(response.body);
+      return data;
+    }
+     else {
+       Fluttertoast.showToast(
+         msg: 'gagal mengambil data',
+         gravity: ToastGravity.BOTTOM
+       );
+     }
+     return null;
+
+}
+
+
+Future getHistoryRewards(int userId) async {
+
+  String baseUrl =
+        "https://duitrest.000webhostapp.com/api/v1/user/historyRewards/$userId";
+    var response = await http.get(baseUrl,
+        headers: {"Accept": "application/json"}
+        );
+    if (response.statusCode == 200) {
+
+      var data = json.decode(response.body);
+      return data;
+    }
+     else {
+       Fluttertoast.showToast(
+         msg: 'gagal mengambil data',
+         gravity: ToastGravity.BOTTOM
+       );
+       return null;
+     }
+
+}
+
+
+Future getHistoryPayment(String phone) async {
+
+  String baseUrl =
+        "https://duitrest.000webhostapp.com/api/v1/user/historyPayment/$phone";
+    var response = await http.get(baseUrl,
+        headers: {"Accept": "application/json"}
+        );
+    if (response.statusCode == 200) {
+
+      var data = json.decode(response.body);
+      return data;
+    }
+     else {
+       Fluttertoast.showToast(
+         msg: 'gagal mengambil data',
+         gravity: ToastGravity.BOTTOM
+
+       );
+     }
+     return null;
+
+}
+
+
+
+Future getTotal() async {
+
+  String baseUrl =
+        "https://duitrest.000webhostapp.com/api/v1/user/total";
+    var response = await http.get(baseUrl,
+        headers: {"Accept": "application/json"}
+        );
+    if (response.statusCode == 200) {
+
+      var data = json.decode(response.body);
+      String total = data['usertotal']['total'];
+      return total;
+    }
+     else {
+       Fluttertoast.showToast(
+         msg: 'gagal mengambil data',
+         gravity: ToastGravity.BOTTOM
+
+       );
+     }
+     return null;
+
+}
+
+
+Future addCoin(String coin, int id) async {
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String token = prefs.getString('token');
+  
+    String baseUrl =
+        "https://duitrest.000webhostapp.com/api/v1/user/giftCoin/$id/$coin?token=$token";
+    var response = await http.post(baseUrl,
+        headers: {"Accept": "application/json"},
+        );
+    if (response.statusCode == 200) {
+      return true;
+    }
+     else {
+       return false;
+     }
+  
+}
+
+
+
 
   
 

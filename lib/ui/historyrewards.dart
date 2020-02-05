@@ -1,14 +1,15 @@
 import 'package:dapetduit_admin/service/fetchdata.dart';
-import 'package:dapetduit_admin/ui/detailuser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-class ListUser extends StatefulWidget {
+class HistoryRewards extends StatefulWidget {
+  final int id;
+  HistoryRewards({Key key, @required this.id}) : super(key:key);
   @override
-  _ListUserState createState() => _ListUserState();
+  _HistoryRewardsState createState() => _HistoryRewardsState();
 }
 
-class _ListUserState extends State<ListUser> {
+class _HistoryRewardsState extends State<HistoryRewards> {
   
 
 
@@ -27,7 +28,7 @@ class _ListUserState extends State<ListUser> {
      isLoading = true; 
     });
 
-    await fetchData.readUser().then((data){
+    await fetchData.getHistoryRewards(widget.id).then((data){
       if(data!=null) {
         if(mounted){
           setState(() {
@@ -48,25 +49,22 @@ class _ListUserState extends State<ListUser> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Daftar User'),
+        title: Text('History Rewards'),
       ),
       body: isLoading? 
       SpinKitThreeBounce(
         size: 30,
         color: Colors.green,
       )
-      : ListView.builder(
+      : data['user'].isEmpty? Center(
+        child: Text('Belum ada data'),
+      ) : ListView.builder(
         itemCount: data['user'].length,
         itemBuilder: (context, index){
           return ListTile(
-            title: Text(data['user'][index]['name']),
-            subtitle: Text(data['user'][index]['phone']['phone'] == null? 'Belum diverifikasi' : data['user'][index]['phone']['phone']),
-            trailing: Text(data['user'][index]['rewards']['rewards']==null? 'Belum ada Rewards' : data['user'][index]['rewards']['rewards']),
-             onTap: (){
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) => UserDetail(data: data['user'][index],)
-              ));
-            },
+            title: Text(data['user'][index]['from']),
+            subtitle: Text(data['user'][index]['created_at']),
+            trailing: Text('+${data['user'][index]['rewards']}', style: TextStyle(color: Colors.amber, fontSize: 20),),
           );
         },
       ),
